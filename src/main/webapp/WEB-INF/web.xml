@@ -20,7 +20,7 @@
 		</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:spring/springmvc.xml</param-value>
+			<param-value>classpath:spring/springmvc-config.xml</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
