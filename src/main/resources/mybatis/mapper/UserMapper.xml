@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jp.dao.UserMapper">
+<select id="selectByLoginnameAndPassword" parameterType="java.lang.String" 
+        resultType="com.jp.po.User">
+  		select * from user 
+  		WHERE loginname = '${loginname}' AND password = '${password}'
+  	</select>
+<!--查询登录的name  -->
+ <select id="selectByLoginname" resultType="com.jp.po.User">
+  		select count(*) from user 
+  		WHERE loginname = '${loginname}' 
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jp.po.User" >
+    update user
+    <set >
+      <if test="username != null" >
+        userName = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="loginname != null" >
+        loginName = #{loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="addresscode != null" >
+        addressCode = #{addresscode,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null" >
+        identity = #{identity,jdbcType=CHAR},
+      </if>
+    </set>
+    where userId = #{userid,jdbcType=INTEGER}
+  </update>
+   <update id="updatePasswordByLoginname" parameterType="java.lang.String">
+      update user set password = #{newPassword}
+      where loginname = #{loginname}
+  </update>
+</mapper>
