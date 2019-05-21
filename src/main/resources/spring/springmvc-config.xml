@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+<beans
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc
-                     http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
-                     http://www.springframework.org/schema/beans
-                     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-                     http://www.springframework.org/schema/context
-                      http://www.springframework.org/schema/context/spring-context-4.0.xsd">
-
-	<!-- 1.配置前端控制器放行静态资源(html/css/js等，否则静态资源将无法访问) -->
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans">
 	<mvc:default-servlet-handler />
-
+	<mvc:annotation-driven />
+	<!-- 1.加载jdbc.properties文件的位置 -->
+	<context:property-placeholder
+		location="classpath:db.properties" />
+	<!-- 2.配置druid连接池 ，id是固定值，class是druid连接池类的全路径 -->
+	<bean class="com.alibaba.druid.pool.DruidDataSource"
+		id="dataSource">
+		<!-- 配置连接数据库的基本信息 -->
+		<property value="${jdbc.driver}" name="driverClassName" />
+		<property value="${jdbc.url}" name="url" />
+		<property value="${jdbc.username}" name="username" />
+		<property value="${jdbc.password}" name="password" />
+	</bean>
+	<!-- 3.整合spring和mybatis框架 将SqlSession等对象的创建交给Spring容器 id值(sqlSessionFactory)是固定值 -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean"
+		id="sqlSessionFactory">
+		<!-- 3.2.配置连接池(数据源) ref指向连接池bean对象的id值 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 3.3、扫描所有的 XxxMapper.xml映射文件，读取其中配置的SQL语句 -->
+		<property value="classpath:mybatis/mapper/*.xml"
+			name="mapperLocations" />
+	</bean>
+	<!-- 4、定义mapper接口扫描器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描所有XxxMapper接口，将接口实例的创建交给spring容器 -->
+		<property value="com.jp.dao" name="basePackage" />
+	</bean>
+	<!-- 5.配置需要扫描的包(service层)：spring自动去扫描 base-package下的类， 如果扫描到的类上有 @Controller、@Service、@Component等注解， 
+		将会自动将类注册为bean（即由spring创建实例） -->
+	<context:component-scan
+		base-package="com.jp.service">
+	</context:component-scan>
+	<!-- 1.配置前端控制器放行静态资源(html/css/js等，否则静态资源将无法访问) -->
 	<!-- 2.配置注解驱动，用于识别注解（比如@Controller） -->
-	<mvc:annotation-driven></mvc:annotation-driven>
-
 	<!-- 3.配置需要扫描的包：spring自动去扫描 base-package 下的类， 如果扫描到的类上有 @Controller、@Service、@Component等注解， 
 		将会自动将类注册为bean -->
-	<context:component-scan base-package="com.jp.controller">
+	<context:component-scan
+		base-package="com.jp.controller">
 	</context:component-scan>
-
 	<!-- 4.配置内部资源视图解析器 prefix:配置路径前缀 suffix:配置文件后缀 -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="/jsp/" />
-		<property name="suffix" value=".jsp" />
+		<property value="/jsp/" name="prefix" />
+		<property value=".jsp" name="suffix" />
 	</bean>
-
-
-
-
-
 </beans>
